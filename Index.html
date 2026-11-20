@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP N°01 CRM : Programmation des Transformations Homogènes | USTHB — M1 AII</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Strictly Academic & Engineering Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- KaTeX v0.16.9 for Crisp Vector LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        display: ['"Outfit"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: {
+                            950: '#090D16',
+                            900: '#111827',
+                            850: '#161F33',
+                            800: '#1E293B',
+                        },
+                        accent: {
+                            blue: '#3B82F6',
+                            cyan: '#06B6D4',
+                            violet: '#8B5CF6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #090D16;
+            color: #E2E8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image:
+                radial-gradient(circle at 12% 8%, rgba(59, 130, 246, 0.11), transparent 34%),
+                radial-gradient(circle at 88% 12%, rgba(139, 92, 246, 0.11), transparent 34%),
+                radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.07), transparent 44%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* Google Pixel Astronomical Obsidian Glassmorphic Cards */
+        .glass-card {
+            background: rgba(17, 24, 39, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 1rem;
+            box-shadow: 0 12px 32px -12px rgba(2, 6, 23, 0.75);
+        }
+
+        .glass-card-elevated {
+            background: rgba(22, 31, 51, 0.84);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 1rem;
+            box-shadow: 0 16px 38px -12px rgba(2, 6, 23, 0.85);
+        }
+
+        .btn-primary {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.015em;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+            color: #FFFFFF;
+            border-radius: 0.65rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.22);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.36);
+            border-color: rgba(167, 139, 250, 0.65);
+        }
+
+        .nav-pill {
+            transition: all 0.18s ease;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(17, 24, 39, 0.65);
+        }
+
+        .nav-pill:hover {
+            border-color: rgba(56, 189, 248, 0.45);
+            color: #FFFFFF;
+            background: rgba(22, 31, 51, 0.9);
+        }
+
+        .nav-pill-active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(139, 92, 246, 0.25) 100%) !important;
+            border-color: rgba(6, 182, 212, 0.6) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 12px rgba(6, 182, 212, 0.16);
+        }
+
+        .code-tab-active {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border-color: rgba(59, 130, 246, 0.6) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* KaTeX Dark Mode Polish */
+        .katex {
+            font-size: 1.03em;
+            color: #F8FAFC;
+        }
+        .katex-display {
+            margin: 0.6rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.2rem 0;
+        }
+
+        /* Range Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 5px;
+            background: #1E293B;
+            border-radius: 999px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #38BDF8;
+            border: 2px solid #090D16;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3B82F6;
+        }
+
+        /* Clean Export PDF / Print Media Rules */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            header {
+                position: static !important;
+                background: #090D16 !important;
+            }
+            body {
+                background: #090D16 !important;
+                color: #F1F5F9 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .glass-card, .glass-card-elevated {
+                background: #111827 !important;
+                backdrop-filter: none !important;
+                box-shadow: none !important;
+                border: 1px solid #33
